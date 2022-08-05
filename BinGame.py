@@ -56,8 +56,12 @@ class Board:
             y_pos = self.top + self.cell_size * 8
             screen.blit(pica, (x_pos, y_pos))
         for y in range(1, self.height - 1):
+            x = 0
+            screen.blit(self.render_digit_pic(self.ii_matrix[y][x], '#E0FFFF'),
+                        (self.left, y * self.cell_size + self.top))
             x = 9
-            screen.blit(self.render_digit_pic(self.board[y][x], 'PaleGoldenrod'), (x * self.cell_size + self.left, y * self.cell_size + self.top))
+            screen.blit(self.render_digit_pic(self.board[y][x], '#EEE8AA'),
+                        (x * self.cell_size + self.left, y * self.cell_size + self.top))
 
 
     # настройка внешнего вида
@@ -69,8 +73,14 @@ class Board:
     # cell - кортеж (x, y)
     def on_click(self, cell):
         self.board[cell[1]][cell[0]] = (self.board[cell[1]][cell[0]] + 1) % 2
-        if self.ii_matrix[cell[1]][0] == 0:  # если число уже дано != 0 !!!!!!!!!!!!!!!!!
-            self.count_user_digit(cell[1])  # кликнул - пересчитывается его число
+        self.count_user_digit(cell[1])  # кликнул - пересчитывается его число
+        print(cell[1])
+        print(self.ii_matrix[cell[1]][0])
+        print(self.board[cell[1]][-1])
+        if self.ii_matrix[cell[1]][0] == self.board[cell[1]][-1]:
+            self.ii_matrix[cell[1]] = ['~~'] + ['0'] * 8
+
+        # self.ii()  # с каждым кликом формируем задание
         if self.board[cell[1]][cell[0]] == 1:
             print('Gotcha 1!')
         if self.board[cell[1]][cell[0]] == 0:
@@ -81,8 +91,6 @@ class Board:
         cell_y = (mouse_pos[1] - self.top) // self.cell_size
         if cell_x < 1 or cell_x >= self.width - 1 or cell_y < 1 or cell_y >= self.height - 1:
             return None
-        # if self.ii_matrix[cell_y][0] == 0:  # если число уже дано != 0 !!!!!!!!!!!!!!!!!
-        #     self.count_user_digit(cell_y)  # кликнул - пересчитывается его число
         return cell_x, cell_y
 
     def get_click(self, mouse_pos):
@@ -91,29 +99,19 @@ class Board:
             self.on_click(cell)
 
     def ii(self):
-        new_digit = [0, 0, 0, 0, 0, 1, 1, 1]  # усложнить, не 0
-        random.shuffle(new_digit)
-        s = 7
-        while s > 1:
-            if self.ii_matrix[s] == [0, 0, 0, 0, 0, 0, 0, 0]:
-                self.ii_matrix[s] = new_digit
-            else:
-                s -= 1
-        if s == 1:
-            self.game_over = True
-            print('Game over')
-
-    def in_time(self):
-        # t = datetime.datetime.now() - start
-        # если пора - выкидываем новое число (функция ii)
-        pass
+        for y in range(1, 9):
+            if self.ii_matrix[y][0] == 0:
+                new_digit = ['0', '0', '0', '0', '0', '1', '1', '1']  # усложнить, не 0
+                random.shuffle(new_digit)
+                self.ii_matrix[y] = new_digit
+                self.ii_matrix[y][0] = int(''.join(self.ii_matrix[y][1:9]), 2)
 
     def count_user_digit(self, y):
         sm = ''
         for x in range(1, self.width - 1):
             sm += str(self.board[y][x])
-        print(y, sm, int(sm, 2))
-        self.board[y][x + 1] = int(sm, 2)
+        # print(y, self.ii_matrix[y], sm, int(sm, 2))
+        self.board[y][-1] = int(sm, 2)
 
     def render_digit_pic(self, digit, color):
         font = pygame.font.Font(None, 80)
@@ -128,6 +126,7 @@ def main():
     pygame.display.set_caption('Binary Game +')
 
     board = Board(10, 9)
+    board.ii()
     running = True
     while running:
         for event in pygame.event.get():
