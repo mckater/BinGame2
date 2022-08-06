@@ -4,6 +4,8 @@ import itertools
 import pygame
 import random
 
+import hello_user
+
 
 class Board:
     # создание поля
@@ -16,7 +18,7 @@ class Board:
         self.game_over = False
         self.ones = pygame.sprite.Group()
         self.left = 35
-        self.top = 50
+        self.top = 100
         self.cell_size = 66
         self.images = ['./img/ice_small.png', './img/2_7_128.png', './img/2_6_64.png', './img/2_5_32.png',
                        './img/2_4_16.png', './img/2_3_8.png', './img/2_2_4.png',  './img/2_1_2.png', './img/2_0_1.png',
@@ -63,8 +65,9 @@ class Board:
             x = 9
             screen.blit(self.render_digit_pic(self.board[y][x], '#EEE8AA')[0],
                         (x * self.cell_size + self.left + 10, y * self.cell_size + self.top))
+        # инфо-панель пользователя
         render_score = self.render_score()
-        screen.blit(render_score[0], (730 - render_score[1] - 10, 660))
+        screen.blit(render_score[0], (730 - render_score[1] - 10, 20))
 
     # настройка внешнего вида
     def set_view(self, left, top, cell_size):
@@ -126,6 +129,7 @@ class Board:
 
 
 def main():
+    level = hello_user.start_screen()
     pygame.init()
     clock = pygame.time.Clock()
     fps = 60
@@ -137,10 +141,14 @@ def main():
     board = Board(10, 9)
     board.ii()
     ices = pygame.sprite.Group()
-
-    ices.add(hards.Ice(board.left, board.top), hards.Ice(board.left + board.cell_size * (board.width-1), board.top),
-             hards.Ice(board.left, board.top + board.cell_size * (board.height-1)),
-             hards.Ice(board.left + board.cell_size * (board.width-1), board.top + board.cell_size * (board.height-1)))
+    ices_to_add = [hards.Ice(board.left, board.top),
+                   hards.Ice(board.left + board.cell_size * (board.width-1), board.top),
+                   hards.Ice(board.left, board.top + board.cell_size * (board.height-1)),
+                   hards.Ice(board.left + board.cell_size * (board.width-1),
+                             board.top + board.cell_size * (board.height-1))]
+    if level:
+        for i in range(level):
+            ices.add(ices_to_add[i])
     ices.draw(screen)
 
     running = True
