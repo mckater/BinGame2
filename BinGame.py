@@ -1,4 +1,8 @@
-import pygame, itertools, datetime, random
+import datetime
+import hards
+import itertools
+import pygame
+import random
 
 
 class Board:
@@ -13,8 +17,9 @@ class Board:
         self.left = 35
         self.top = 50
         self.cell_size = 66
-        self.images = [None, './img/2_7_128.png', './img/2_6_64.png', './img/2_5_32.png', './img/2_4_16.png',
-                       './img/2_3_8.png', './img/2_2_4.png',  './img/2_1_2.png', './img/2_0_1.png', None]
+        self.images = ['./img/ice_small.png', './img/2_7_128.png', './img/2_6_64.png', './img/2_5_32.png',
+                       './img/2_4_16.png', './img/2_3_8.png', './img/2_2_4.png',  './img/2_1_2.png', './img/2_0_1.png',
+                       './img/ice_small.png']
 
     def render(self, screen):
         colors = [pygame.Color("#006400"), pygame.Color("#3CB371"), pygame.Color("black")]
@@ -48,7 +53,7 @@ class Board:
             one_or_zero = './img/' + str(self.board[y][x]) + '.png'
             screen.blit(pygame.image.load(one_or_zero), (x * self.cell_size + self.left, y * self.cell_size + self.top))
 
-        for x in range(1, self.width - 1):
+        for x in range(0, self.width):
             pica = pygame.image.load(self.images[x])
             x_pos = self.left + self.cell_size * x
             y_pos = self.top
@@ -71,16 +76,20 @@ class Board:
         self.cell_size = cell_size
 
     # cell - кортеж (x, y)
-    def on_click(self, cell):
+    def on_click(self, cell):  # с каждым кликом
         self.board[cell[1]][cell[0]] = (self.board[cell[1]][cell[0]] + 1) % 2
         self.count_user_digit(cell[1])  # кликнул - пересчитывается его число
         print(cell[1])
         print(self.ii_matrix[cell[1]][0])
         print(self.board[cell[1]][-1])
-        if self.ii_matrix[cell[1]][0] == self.board[cell[1]][-1]:
-            self.ii_matrix[cell[1]] = ['~~'] + ['0'] * 8
+        # if self.ii_matrix[cell[1]][0] == self.board[cell[1]][-1]:  # on results
+        #     self.ii_matrix[cell[1]][0] = '+'
+        if all([int(self.ii_matrix[cell[1]][i]) == self.board[cell[1]][i] for i in range(1, 9)]):
+            self.ii_matrix[cell[1]][0] = '+'
+        else:
+            self.ii_matrix[cell[1]][0] = int(''.join(self.ii_matrix[cell[1]][1:9]), 2)
 
-        # self.ii()  # с каждым кликом формируем задание
+
         if self.board[cell[1]][cell[0]] == 1:
             print('Gotcha 1!')
         if self.board[cell[1]][cell[0]] == 0:
@@ -100,17 +109,17 @@ class Board:
 
     def ii(self):
         for y in range(1, 9):
-            if self.ii_matrix[y][0] == 0:
-                new_digit = ['0', '0', '0', '0', '0', '1', '1', '1']  # усложнить, не 0
+            if self.ii_matrix[y][0] != '+':
+                ones = random.randint(1, 6)
+                new_digit = ['1'] * ones + ['0'] * (8 - ones)
                 random.shuffle(new_digit)
-                self.ii_matrix[y] = new_digit
-                self.ii_matrix[y][0] = int(''.join(self.ii_matrix[y][1:9]), 2)
+                self.ii_matrix[y][1:9] = new_digit
+                self.ii_matrix[y][0] = int(''.join(self.ii_matrix[y][1:9]), 2) # загаданное число
 
     def count_user_digit(self, y):
         sm = ''
         for x in range(1, self.width - 1):
             sm += str(self.board[y][x])
-        # print(y, self.ii_matrix[y], sm, int(sm, 2))
         self.board[y][-1] = int(sm, 2)
 
     def render_digit_pic(self, digit, color):
@@ -118,15 +127,25 @@ class Board:
         return font.render(str(digit), True, color)
 
 
+
 def main():
     pygame.init()
+    clock = pygame.time.Clock()
+    fps = 60
     start = datetime.datetime.now()
     size = 730, 730
     screen = pygame.display.set_mode(size)
-    pygame.display.set_caption('Binary Game +')
+    pygame.display.set_caption('Binary Game')
 
     board = Board(10, 9)
     board.ii()
+    ices = pygame.sprite.Group()
+    ones = pygame.sprite.Group()
+    ices.add(hards.Ice(board.left, board.top), hards.Ice(board.left + board.cell_size * (board.width-1), board.top),
+             hards.Ice(board.left, board.top + board.cell_size * (board.height-1)),
+             hards.Ice(board.left + board.cell_size * (board.width-1), board.top + board.cell_size * (board.height-1)))
+    ices.draw(screen)
+
     running = True
     while running:
         for event in pygame.event.get():
@@ -136,8 +155,10 @@ def main():
                 board.get_click(event.pos)
         screen.fill('#2F4F4F')
         board.render(screen)
-
+        ices.draw(screen)
+        ices.update(size)
         pygame.display.flip()
+        clock.tick(fps)
     pygame.quit()
 
 
