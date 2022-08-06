@@ -6,15 +6,21 @@ ones_sprites = pygame.sprite.Group()
 
 
 class One(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, group_of_ones):
         super().__init__(ones_sprites)
-        self.one_image = pygame.image.load('./img/1.png')
-        self.w = self.one_image.get_width()
-        self.h = self.one_image.get_height()
-        self.rect = self.one_image.get_rect()
+        self.image = pygame.image.load('./img/1_red.png')
+        self.w = self.image.get_width()
+        self.h = self.image.get_height()
+        self.rect = self.image.get_rect()
 # перехватываем расположение каждой единички в угаданных числах
         self.rect.left = x
         self.rect.top = y
+        self.add(group_of_ones)
+
+    def update(self, group_of_ice):
+        if pygame.sprite.spritecollideany(self, group_of_ice):
+            self.kill()
+            return False
 
 
 class Ice(pygame.sprite.Sprite):

@@ -14,6 +14,7 @@ class Board:
         self.ii_matrix = [[0] * width for _ in range(height)]
         # значения по умолчанию
         self.game_over = False
+        self.ones = pygame.sprite.Group()
         self.left = 35
         self.top = 50
         self.cell_size = 66
@@ -84,11 +85,21 @@ class Board:
         print(self.board[cell[1]][-1])
         # if self.ii_matrix[cell[1]][0] == self.board[cell[1]][-1]:  # on results
         #     self.ii_matrix[cell[1]][0] = '+'
-        if all([int(self.ii_matrix[cell[1]][i]) == self.board[cell[1]][i] for i in range(1, 9)]):
+        if all([int(self.ii_matrix[cell[1]][i]) == self.board[cell[1]][i] for i in range(1, self.width - 1)]):
             self.ii_matrix[cell[1]][0] = '+'
+            # i = 0
+            # for one in self.board[cell[1]]:
+            #     i += 1
+            #     if one:
+            #         x, y = i, cell[1]
+            #         hards.One(x * self.cell_size + self.left, y * self.cell_size + self.top, self.ones)
+            for i in range(1, self.width - 1):
+                if self.board[cell[1]][i]:
+                    x, y = i, cell[1]
+                    hards.One(x * self.cell_size + self.left, y * self.cell_size + self.top, self.ones)
+
         else:
             self.ii_matrix[cell[1]][0] = int(''.join(self.ii_matrix[cell[1]][1:9]), 2)
-
 
         if self.board[cell[1]][cell[0]] == 1:
             print('Gotcha 1!')
@@ -111,7 +122,7 @@ class Board:
         for y in range(1, 9):
             if self.ii_matrix[y][0] != '+':
                 ones = random.randint(1, 6)
-                new_digit = ['1'] * ones + ['0'] * (8 - ones)
+                new_digit = ['1'] * ones + ['0'] * (self.width - 2 - ones)
                 random.shuffle(new_digit)
                 self.ii_matrix[y][1:9] = new_digit
                 self.ii_matrix[y][0] = int(''.join(self.ii_matrix[y][1:9]), 2) # загаданное число
@@ -140,7 +151,7 @@ def main():
     board = Board(10, 9)
     board.ii()
     ices = pygame.sprite.Group()
-    ones = pygame.sprite.Group()
+
     ices.add(hards.Ice(board.left, board.top), hards.Ice(board.left + board.cell_size * (board.width-1), board.top),
              hards.Ice(board.left, board.top + board.cell_size * (board.height-1)),
              hards.Ice(board.left + board.cell_size * (board.width-1), board.top + board.cell_size * (board.height-1)))
@@ -157,6 +168,8 @@ def main():
         board.render(screen)
         ices.draw(screen)
         ices.update(size)
+        board.ones.update(ices)
+        board.ones.draw(screen)
         pygame.display.flip()
         clock.tick(fps)
     pygame.quit()
