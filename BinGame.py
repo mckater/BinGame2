@@ -45,12 +45,6 @@ class Board:
                         x * self.cell_size + self.left, y * self.cell_size + self.top, self.cell_size,
                         self.cell_size))
         for x, y in itertools.product(range(1, self.width - 1), range(1, self.height - 1)):
-            # pygame.draw.rect(screen, colors[self.board[y][x]], (
-            #     x * self.cell_size + self.left, y * self.cell_size + self.top, self.cell_size,
-            #     self.cell_size))
-            # pygame.draw.rect(screen, pygame.Color("white"), (
-            #     x * self.cell_size + self.left, y * self.cell_size + self.top, self.cell_size,
-            #     self.cell_size), 1)
             one_or_zero = './img/' + str(self.board[y][x]) + '.png'
             screen.blit(pygame.image.load(one_or_zero), (x * self.cell_size + self.left, y * self.cell_size + self.top))
 
@@ -63,12 +57,14 @@ class Board:
             screen.blit(pica, (x_pos, y_pos))
         for y in range(1, self.height - 1):
             x = 0
-            screen.blit(self.render_digit_pic(self.ii_matrix[y][x], '#E0FFFF'),
-                        (self.left, y * self.cell_size + self.top))
+            leftpic = self.render_digit_pic(self.ii_matrix[y][x], '#E0FFFF')
+            screen.blit(leftpic[0],
+                        (self.left + self.cell_size - leftpic[1] - 10, y * self.cell_size + self.top))
             x = 9
-            screen.blit(self.render_digit_pic(self.board[y][x], '#EEE8AA'),
-                        (x * self.cell_size + self.left, y * self.cell_size + self.top))
-
+            screen.blit(self.render_digit_pic(self.board[y][x], '#EEE8AA')[0],
+                        (x * self.cell_size + self.left + 10, y * self.cell_size + self.top))
+        render_score = self.render_score()
+        screen.blit(render_score[0], (730 - render_score[1] - 10, 660))
 
     # настройка внешнего вида
     def set_view(self, left, top, cell_size):
@@ -80,31 +76,16 @@ class Board:
     def on_click(self, cell):  # с каждым кликом
         self.board[cell[1]][cell[0]] = (self.board[cell[1]][cell[0]] + 1) % 2
         self.count_user_digit(cell[1])  # кликнул - пересчитывается его число
-        print(cell[1])
-        print(self.ii_matrix[cell[1]][0])
-        print(self.board[cell[1]][-1])
-        # if self.ii_matrix[cell[1]][0] == self.board[cell[1]][-1]:  # on results
-        #     self.ii_matrix[cell[1]][0] = '+'
         if all([int(self.ii_matrix[cell[1]][i]) == self.board[cell[1]][i] for i in range(1, self.width - 1)]):
             self.ii_matrix[cell[1]][0] = '+'
-            # i = 0
-            # for one in self.board[cell[1]]:
-            #     i += 1
-            #     if one:
-            #         x, y = i, cell[1]
-            #         hards.One(x * self.cell_size + self.left, y * self.cell_size + self.top, self.ones)
             for i in range(1, self.width - 1):
                 if self.board[cell[1]][i]:
                     x, y = i, cell[1]
                     hards.One(x * self.cell_size + self.left, y * self.cell_size + self.top, self.ones)
+                    hards.score += 10
 
         else:
             self.ii_matrix[cell[1]][0] = int(''.join(self.ii_matrix[cell[1]][1:9]), 2)
-
-        if self.board[cell[1]][cell[0]] == 1:
-            print('Gotcha 1!')
-        if self.board[cell[1]][cell[0]] == 0:
-            print('Gotcha 0000000000!')
 
     def get_cell(self, mouse_pos):
         cell_x = (mouse_pos[0] - self.left) // self.cell_size
@@ -134,9 +115,14 @@ class Board:
         self.board[y][-1] = int(sm, 2)
 
     def render_digit_pic(self, digit, color):
-        font = pygame.font.Font(None, 80)
-        return font.render(str(digit), True, color)
+        font = pygame.font.Font(None, 64)
+        rendered = font.render(str(digit), True, color)
+        return rendered, rendered.get_width()
 
+    def render_score(self):
+        font = pygame.font.Font(None, 80)
+        rendered_score = font.render(str(hards.score), True, '#E0FFFF')
+        return rendered_score, rendered_score.get_width()
 
 
 def main():
