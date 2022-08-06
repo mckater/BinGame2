@@ -9,19 +9,19 @@ class Levels:
         self.height = height
         self.board = [[0] * width for _ in range(height)]
         # значения по умолчанию
-        self.left = 370
-        self.top = 200
-        self.cell_size = 100
+        self.left = 470
+        self.top = 80
+        self.cell_size = 110
 
     def render(self, screen):
         for y in range(self.height):
             for x in range(self.width):
-                font = pygame.font.Font(None, 90)
-                screen.blit(font.render(str(y), 1, pygame.Color('white')), (x * self.cell_size + self.cell_size // 3 + self.left, y * self.cell_size + self.cell_size // 3 + self.top, self.cell_size,
+                font = pygame.font.Font(None, 60)
+                screen.blit(font.render(str(y) + '.lvl', 1, pygame.Color('orange')), (x * self.cell_size + 18 + self.left, y * self.cell_size + self.cell_size // 3 + self.top, self.cell_size,
                     self.cell_size))
                 pygame.draw.rect(screen, pygame.Color(255, 255, 255), (
                     x * self.cell_size + self.left, y * self.cell_size + self.top, self.cell_size,
-                    self.cell_size), 1)
+                    self.cell_size), 3)
 
     # настройка внешнего вида
     def set_view(self, left, top, cell_size):
@@ -48,15 +48,16 @@ def terminate():
     sys.exit()
 
 def start_screen():
-    intro_text = ["ЗАСТАВКА", "",
-                  "Правила игры",
-                  "Если в правилах несколько строк,",
-                  "приходится выводить их построчно"]
+    intro_text = ["Binary Game", "",
+                  "Правила игры:",
+                  "собирайте двоичные числа,",
+                  "и будет Вам счастье",
+                  "ВЫБОР УРОВНЯ - 0...4"]
 
     fon = pygame.image.load('./img/metal.png')
     screen.blit(fon, (0, 0))
-    font = pygame.font.Font(None, 30)
-    text_coord = 50
+    font = pygame.font.Font(None, 36)
+    text_coord = 60
     for line in intro_text:
         string_rendered = font.render(line, 1, pygame.Color('white'))
         intro_rect = string_rendered.get_rect()

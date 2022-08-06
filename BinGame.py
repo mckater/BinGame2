@@ -9,13 +9,15 @@ import hello_user
 
 class Board:
     # создание поля
-    def __init__(self, width, height):
+    def __init__(self, width, height, level):
+        self.level = level
         self.width = width
         self.height = height
         self.board = [[0] * width for _ in range(height)]
         self.ii_matrix = [[0] * width for _ in range(height)]
         # значения по умолчанию
         self.game_over = False
+        self.cell_stop_list = list()  # блокируем уже решённые строки
         self.ones = pygame.sprite.Group()
         self.left = 35
         self.top = 100
@@ -77,18 +79,23 @@ class Board:
 
     # cell - кортеж (x, y)
     def on_click(self, cell):  # с каждым кликом
-        self.board[cell[1]][cell[0]] = (self.board[cell[1]][cell[0]] + 1) % 2
-        self.count_user_digit(cell[1])  # кликнул - пересчитывается его число
-        if all([int(self.ii_matrix[cell[1]][i]) == self.board[cell[1]][i] for i in range(1, self.width - 1)]):
-            self.ii_matrix[cell[1]][0] = '+'
-            for i in range(1, self.width - 1):
-                if self.board[cell[1]][i]:
-                    x, y = i, cell[1]
-                    hards.One(x * self.cell_size + self.left, y * self.cell_size + self.top, self.ones)
-                    hards.score += 10
+        if cell not in self.cell_stop_list:
+            self.board[cell[1]][cell[0]] = (self.board[cell[1]][cell[0]] + 1) % 2
+            self.count_user_digit(cell[1])  # кликнул - пересчитывается его число
+            if all([int(self.ii_matrix[cell[1]][i]) == self.board[cell[1]][i] for i in range(1, self.width - 1)]):
+                self.ii_matrix[cell[1]][0] = '+'
+                self.cell_stop_list.extend([(stop, cell[1]) for stop in range(1, self.width - 1)])
+                for i in range(1, self.width - 1):
+                    if self.board[cell[1]][i]:
+                        x, y = i, cell[1]
+                        hards.One(x * self.cell_size + self.left, y * self.cell_size + self.top, self.ones)
+                        hards.score += 2 + 2 * self.level
 
-        else:
-            self.ii_matrix[cell[1]][0] = int(''.join(self.ii_matrix[cell[1]][1:9]), 2)
+            else:
+                self.ii_matrix[cell[1]][0] = int(''.join(self.ii_matrix[cell[1]][1:9]), 2)
+            if all([self.ii_matrix[y][0] == '+' for y in range(1, self.height - 1)]):
+                self.game_over = True
+                print('game_over')
 
     def get_cell(self, mouse_pos):
         cell_x = (mouse_pos[0] - self.left) // self.cell_size
@@ -138,7 +145,7 @@ def main():
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('Binary Game')
 
-    board = Board(10, 9)
+    board = Board(10, 9, level)
     board.ii()
     ices = pygame.sprite.Group()
     ices_to_add = [hards.Ice(board.left, board.top),

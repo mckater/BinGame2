@@ -21,7 +21,7 @@ class One(pygame.sprite.Sprite):
         global score
         if pygame.sprite.spritecollideany(self, group_of_ice):
             self.kill()
-            score -= 1
+            score -= 2
 
 
 class Ice(pygame.sprite.Sprite):
