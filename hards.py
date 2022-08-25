@@ -12,16 +12,28 @@ class One(pygame.sprite.Sprite):
         self.w = self.image.get_width()
         self.h = self.image.get_height()
         self.rect = self.image.get_rect()
-# перехватываем расположение каждой единички в угаданных числах/ to delete!!!
+# перехватываем расположение каждой единички в угаданных числах
         self.rect.left = x
         self.rect.top = y
+# 35, 66 и 100 можно бы передать из борды, но мы не собираемся менять размеры
+# Можно так.
+        self.cell_x = (x - 35) // 66
+        self.cell_y = (y - 100) // 66
+
         self.add(group_of_ones)
 
-    def update(self, group_of_ice):
+    def update(self, group_of_ice, board):
         global score
         if pygame.sprite.spritecollideany(self, group_of_ice):
+
+# заново считаем загаданное число
+            board.ii_how_many(self.cell_y)
+# разблокируем эту клетку для пользователя
+            board.cell_stop_list.remove((self.cell_x, self.cell_y))
+# у игрока эта его клетка - снова ноль
+            board.board[self.cell_y][self.cell_x] = 0
             self.kill()
-            score -= 2
+            score -= 5
 
 
 class Ice(pygame.sprite.Sprite):
@@ -33,8 +45,8 @@ class Ice(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.ice_image, (self.w, self.h))
         self.rect = self.image.get_rect()
 # шаг спрайта определяем случайно, по сути это скорость
-        self.vx = random.randint(-5, 5)
-        self.vy = random.randrange(-5, 5)
+        self.vx = random.randint(-1, 1)
+        self.vy = random.randrange(-1, 1)
 # в начале льды в по углам
         self.rect.left = x
         self.rect.top = y

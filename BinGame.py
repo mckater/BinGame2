@@ -53,18 +53,19 @@ class Board:
             screen.blit(pygame.image.load(one_or_zero), (x * self.cell_size + self.left, y * self.cell_size + self.top))
 
         for x in range(0, self.width):
-            pica = pygame.image.load(self.images[x])
-            x_pos = self.left + self.cell_size * x
-            y_pos = self.top
-            screen.blit(pica, (x_pos, y_pos))
-            y_pos = self.top + self.cell_size * 8
-            screen.blit(pica, (x_pos, y_pos))
+            if self.level < 4:
+                pica = pygame.image.load(self.images[x])  # подсказки степени двойки
+                x_pos = self.left + self.cell_size * x
+                y_pos = self.top
+                screen.blit(pica, (x_pos, y_pos))
+                y_pos = self.top + self.cell_size * 8
+                screen.blit(pica, (x_pos, y_pos))
         for y in range(1, self.height - 1):
-            x = 0
+            x = 0  # слева загаданные числа
             leftpic = self.render_digit_pic(self.ii_matrix[y][x], '#E0FFFF')
             screen.blit(leftpic[0],
                         (self.left + self.cell_size - leftpic[1] - 10, y * self.cell_size + self.top))
-            x = 9
+            x = 9  # справа числа игрока
             screen.blit(self.render_digit_pic(self.board[y][x], '#EEE8AA')[0],
                         (x * self.cell_size + self.left + 10, y * self.cell_size + self.top))
         # инфо-панель пользователя
@@ -94,8 +95,16 @@ class Board:
             else:
                 self.ii_matrix[cell[1]][0] = int(''.join(self.ii_matrix[cell[1]][1:9]), 2)
             if all([self.ii_matrix[y][0] == '+' for y in range(1, self.height - 1)]):
-                self.game_over = True
-                print('game_over')
+
+                if self.level < 5:
+                    pygame.draw.rect(pygame.display.set_mode((self.width * self.cell_size + self.left,
+                                                              self.height * self.cell_size + self.top)), '#2F4F4F',
+                                     (0, 0, self.width * self.cell_size + self.left,
+                                      self.height * self.cell_size + self.top))
+                    main()
+
+                else:
+                    self.game_over = True
 
     def get_cell(self, mouse_pos):
         cell_x = (mouse_pos[0] - self.left) // self.cell_size
@@ -112,11 +121,17 @@ class Board:
     def ii(self):
         for y in range(1, 9):
             if self.ii_matrix[y][0] != '+':
-                ones = random.randint(1, 6)
+                if self.level > 0:
+                    ones = random.randint(1, 6)
+                else:
+                    ones = 1
                 new_digit = ['1'] * ones + ['0'] * (self.width - 2 - ones)
                 random.shuffle(new_digit)
                 self.ii_matrix[y][1:9] = new_digit
-                self.ii_matrix[y][0] = int(''.join(self.ii_matrix[y][1:9]), 2) # загаданное число
+                self.ii_how_many(y) # рассчитать загаданное число
+
+    def ii_how_many(self, y):
+        self.ii_matrix[y][0] = int(''.join(self.ii_matrix[y][1:9]), 2)
 
     def count_user_digit(self, y):
         sm = ''
@@ -159,7 +174,7 @@ def main():
     ices.draw(screen)
 
     running = True
-    while running:
+    while running and not board.game_over:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -169,7 +184,7 @@ def main():
         board.render(screen)
         ices.draw(screen)
         ices.update(size)
-        board.ones.update(ices)
+        board.ones.update(ices, board)
         board.ones.draw(screen)
         pygame.display.flip()
         clock.tick(fps)
