@@ -1,6 +1,6 @@
 import sys
-
 import pygame
+
 
 class WhatIsTheNext:
     # создание кнопок
@@ -55,7 +55,7 @@ def terminate():
 def win_screen():
     intro_text = ["Binary Game", "",
                   "ПОБЕДА!",
-                  "выбирайте:",
+                  "На выбор",
                   "есть два",
                   "варианта -"]
 

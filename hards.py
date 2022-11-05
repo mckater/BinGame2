@@ -5,7 +5,7 @@ ice_sprites = pygame.sprite.Group()
 ones_sprites = pygame.sprite.Group()
 score = 0
 
-class One(pygame.sprite.Sprite):
+class One(pygame.sprite.Sprite):  # единичка
     def __init__(self, x, y, group_of_ones):
         super().__init__(ones_sprites)
         self.image = pygame.image.load('./img/1_red.png')
@@ -32,6 +32,8 @@ class One(pygame.sprite.Sprite):
             board.cell_stop_list.remove((self.cell_x, self.cell_y))
 # у игрока эта его клетка - снова ноль
             board.board[self.cell_y][self.cell_x] = 0
+# и число игрока справа - пересчитывается
+            board.count_user_digit(self.cell_y)
             self.kill()
             score -= 5
 
@@ -45,8 +47,8 @@ class Ice(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.ice_image, (self.w, self.h))
         self.rect = self.image.get_rect()
 # шаг спрайта определяем случайно, по сути это скорость
-        self.vx = random.randint(-1, 1)
-        self.vy = random.randrange(-1, 1)
+        self.vx = random.randint(-2, 2)
+        self.vy = random.randrange(-2, 2)
 # в начале льды в по углам
         self.rect.left = x
         self.rect.top = y

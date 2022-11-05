@@ -1,6 +1,7 @@
 import sys
-
 import pygame
+import hards
+
 
 class Levels:
     # создание кнопок
@@ -17,7 +18,9 @@ class Levels:
         for y in range(self.height):
             for x in range(self.width):
                 font = pygame.font.Font(None, 60)
-                screen.blit(font.render(str(y) + '.lvl', 1, pygame.Color('orange')), (x * self.cell_size + 18 + self.left, y * self.cell_size + self.cell_size // 3 + self.top, self.cell_size,
+                screen.blit(font.render(str(y) + '.lvl', 1, pygame.Color('orange')),
+                            (x * self.cell_size + 18 + self.left,
+                             y * self.cell_size + self.cell_size // 3 + self.top, self.cell_size,
                     self.cell_size))
                 pygame.draw.rect(screen, pygame.Color(255, 255, 255), (
                     x * self.cell_size + self.left, y * self.cell_size + self.top, self.cell_size,
@@ -43,16 +46,18 @@ class Levels:
         else:
             pass
 
+
 def terminate():
     pygame.quit()
     sys.exit()
 
-def start_screen():
+
+def start_screen(lvl):
     intro_text = ["Binary Game", "",
                   "Правила игры:",
                   "собирайте двоичные числа,",
-                  "и будет Вам счастье",
-                  "ВЫБОР УРОВНЯ - 0...4"]
+                  f"НАБРАНО ОЧКОВ: {hards.score}",
+                  f"ДОСТУПНЫ УРОВНИ: от 0 до {lvl}"]
 
     fon = pygame.image.load('./img/metal.png')
     screen.blit(fon, (0, 0))
@@ -66,7 +71,8 @@ def start_screen():
         intro_rect.x = 10
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
-    levels = Levels(1, 5)
+
+    levels = Levels(1, lvl + 1)
 
     while True:
         for event in pygame.event.get():
@@ -89,4 +95,5 @@ clock = pygame.time.Clock()
 FPS = 50
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Binary Game')
-start_screen()
+lvl = 0
+start_screen(lvl)

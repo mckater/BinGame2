@@ -101,7 +101,7 @@ class Board:
                                                               self.height * self.cell_size + self.top)), '#2F4F4F',
                                      (0, 0, self.width * self.cell_size + self.left,
                                       self.height * self.cell_size + self.top))
-                    main()
+                    main(self.level)  # отправляем игрока на старт_скрин, но с очками
 
                 else:
                     self.game_over = True
@@ -121,14 +121,14 @@ class Board:
     def ii(self):
         for y in range(1, 9):
             if self.ii_matrix[y][0] != '+':
-                if self.level > 0:
+                if self.level > 2:
                     ones = random.randint(1, 6)
                 else:
-                    ones = 1
+                    ones = self.level + 1
                 new_digit = ['1'] * ones + ['0'] * (self.width - 2 - ones)
                 random.shuffle(new_digit)
                 self.ii_matrix[y][1:9] = new_digit
-                self.ii_how_many(y) # рассчитать загаданное число
+                self.ii_how_many(y) # десятичное загаданное число
 
     def ii_how_many(self, y):
         self.ii_matrix[y][0] = int(''.join(self.ii_matrix[y][1:9]), 2)
@@ -150,8 +150,8 @@ class Board:
         return rendered_score, rendered_score.get_width()
 
 
-def main():
-    level = hello_user.start_screen()
+def main(level):
+    level = hello_user.start_screen(level + 1)
     pygame.init()
     clock = pygame.time.Clock()
     fps = 60
@@ -192,4 +192,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(0)
