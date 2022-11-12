@@ -1,5 +1,6 @@
 import sys
 import pygame
+# from BinGame import
 
 
 class WhatIsTheNext:
@@ -11,15 +12,16 @@ class WhatIsTheNext:
         # значения по умолчанию
         self.left = 70
         self.top = 280
-        self.cell_size = 55
+        self.cell_size = 100
 
     def render(self, screen):
-        choice = ('1    - Играть ещё', '2    - Выйти')
-        for y in range(2):
+        choice = ('Play', 'Quit')
+        for y in range(1):
             for x in range(self.width):
                 font = pygame.font.Font(None, 38)
-                screen.blit(font.render(choice[y], 1, pygame.Color('#3C6371')), (x * self.cell_size + 22 + self.left, y * self.cell_size + self.cell_size // 3 + self.top, self.cell_size,
-                    self.cell_size))
+                screen.blit(font.render(choice[x], 1, pygame.Color('#3C6371')),
+                            (x * self.cell_size + 22 + self.left, y * self.cell_size + self.cell_size // 3 + self.top,
+                             self.cell_size, self.cell_size))
                 pygame.draw.rect(screen, pygame.Color(50, 155, 55), (
                     x * self.cell_size + self.left, y * self.cell_size + self.top, self.cell_size,
                     self.cell_size), 5)
@@ -37,6 +39,8 @@ class WhatIsTheNext:
             return None
         else:
             print(cell_x, cell_y)
+            # if cell_x == '0':
+            #     print(keyboardinput.inputName())
         return cell_x, cell_y
 
     def get_click(self, mouse_pos):
@@ -52,14 +56,20 @@ def terminate():
     sys.exit()
 
 
-def win_screen():
+def main(name, score):
+    size = 580, 680
+    pygame.init()
+    clock = pygame.time.Clock()
+    screen = pygame.display.set_mode(size)
+    pygame.display.set_caption('Binary Game - ПОБЕДА!')
+
     intro_text = ["Binary Game", "",
                   "ПОБЕДА!",
                   "На выбор",
                   "есть два",
                   "варианта -"]
 
-    fon = pygame.image.load('./img/ice.png')
+    fon = pygame.image.load('./img/metal.png')
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 36)
     text_coord = 40
@@ -71,7 +81,7 @@ def win_screen():
         intro_rect.x = 10
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
-    choose = WhatIsTheNext(1, 2)
+    choose = WhatIsTheNext(2, 1)
 
     while True:
         for event in pygame.event.get():
@@ -86,14 +96,3 @@ def win_screen():
         choose.render(screen)
         pygame.display.flip()
         clock.tick(50)
-
-
-WIDTH, HEIGHT = size = 580, 880
-pygame.init()
-clock = pygame.time.Clock()
-screen = pygame.display.set_mode(size)
-pygame.display.set_caption('Binary Game - ПОБЕДА!')
-gameover = win_screen()
-
-
-

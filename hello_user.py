@@ -5,7 +5,8 @@ import hards
 
 class Levels:
     # создание кнопок
-    def __init__(self, width, height):
+    def __init__(self, width, height, username):
+        self.username = username
         self.width = width
         self.height = height
         self.board = [[0] * width for _ in range(height)]
@@ -42,7 +43,8 @@ class Levels:
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
         if cell:
-            return sum(cell)
+            print(f'now level = {sum(cell)}, username = {self.username}')
+            return sum(cell), self.username
         else:
             pass
 
@@ -52,12 +54,12 @@ def terminate():
     sys.exit()
 
 
-def start_screen(lvl):
+def start_screen(lvl, username):
     intro_text = ["Binary Game", "",
-                  "Правила игры:",
+                  "Ведите Ваше имя:",
                   "собирайте двоичные числа,",
                   f"НАБРАНО ОЧКОВ: {hards.score}",
-                  f"ДОСТУПНЫ УРОВНИ: от 0 до {lvl}"]
+                  f"ВЫБЕРИТЕ УРОВЕНЬ: до {lvl}"]
 
     fon = pygame.image.load('./img/metal.png')
     screen.blit(fon, (0, 0))
@@ -71,8 +73,18 @@ def start_screen(lvl):
         intro_rect.x = 10
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
+    base_font = pygame.font.Font(None, 32)
+    user_text = username
 
-    levels = Levels(1, lvl + 1)
+    input_rect = pygame.Rect(250, 130, 140, 32)
+    color_active = pygame.Color("#3CB371")
+
+    color_passive = pygame.Color("#006400")
+    color = color_passive
+
+    active = False
+
+    levels = Levels(1, lvl + 1, username)
 
     while True:
         for event in pygame.event.get():
@@ -84,6 +96,32 @@ def start_screen(lvl):
                     pass
                 else:
                     return click
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if input_rect.collidepoint(event.pos):
+                    active = True
+                else:
+                    active = False
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE:
+                    user_text = user_text[:-1]
+                else:
+                    user_text += event.unicode
+                levels.username = user_text
+
+        if active:
+            color = color_active
+        else:
+            color = color_passive
+
+        pygame.draw.rect(screen, color, input_rect)
+        text_surface = base_font.render(user_text, True, ("black"))
+
+        # рендеринг согласно вводу мени пользователя
+        screen.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
+        input_rect.w = max(100, text_surface.get_width() + 10)
+
         levels.render(screen)
         pygame.display.flip()
         clock.tick(FPS)
@@ -94,6 +132,4 @@ pygame.init()
 clock = pygame.time.Clock()
 FPS = 50
 screen = pygame.display.set_mode(size)
-pygame.display.set_caption('Binary Game')
-lvl = 0
-start_screen(lvl)
+pygame.display.set_caption('Binary Game hello')

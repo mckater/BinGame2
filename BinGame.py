@@ -1,18 +1,21 @@
 import datetime
+import sys
+
 import hards
 import itertools
 import pygame
 import random
 
-import hello_user
+import hello_user, win, hall_of_fame
 
 
 class Board:
     # создание поля
-    def __init__(self, width, height, level):
+    def __init__(self, width, height, level, username):
         self.level = level
         self.width = width
         self.height = height
+        self.username = username
         self.board = [[0] * width for _ in range(height)]
         self.ii_matrix = [[0] * width for _ in range(height)]
         # значения по умолчанию
@@ -23,7 +26,7 @@ class Board:
         self.top = 100
         self.cell_size = 66
         self.images = ['./img/ice_small.png', './img/2_7_128.png', './img/2_6_64.png', './img/2_5_32.png',
-                       './img/2_4_16.png', './img/2_3_8.png', './img/2_2_4.png',  './img/2_1_2.png', './img/2_0_1.png',
+                       './img/2_4_16.png', './img/2_3_8.png', './img/2_2_4.png', './img/2_1_2.png', './img/2_0_1.png',
                        './img/ice_small.png']
 
     def render(self, screen):
@@ -95,16 +98,11 @@ class Board:
             else:
                 self.ii_matrix[cell[1]][0] = int(''.join(self.ii_matrix[cell[1]][1:9]), 2)
             if all([self.ii_matrix[y][0] == '+' for y in range(1, self.height - 1)]):
-
-                if self.level < 5:
-                    pygame.draw.rect(pygame.display.set_mode((self.width * self.cell_size + self.left,
-                                                              self.height * self.cell_size + self.top)), '#2F4F4F',
-                                     (0, 0, self.width * self.cell_size + self.left,
-                                      self.height * self.cell_size + self.top))
-                    main(self.level)  # отправляем игрока на старт_скрин, но с очками
-
-                else:
-                    self.game_over = True
+                pygame.draw.rect(pygame.display.set_mode((self.width * self.cell_size + self.left,
+                                                          self.height * self.cell_size + self.top)), '#2F4F4F',
+                                 (0, 0, self.width * self.cell_size + self.left,
+                                  self.height * self.cell_size + self.top))
+                main(self.level, self.username)  # отправляем игрока на старт_скрин, но с очками
 
     def get_cell(self, mouse_pos):
         cell_x = (mouse_pos[0] - self.left) // self.cell_size
@@ -128,7 +126,7 @@ class Board:
                 new_digit = ['1'] * ones + ['0'] * (self.width - 2 - ones)
                 random.shuffle(new_digit)
                 self.ii_matrix[y][1:9] = new_digit
-                self.ii_how_many(y) # десятичное загаданное число
+                self.ii_how_many(y)  # десятичное загаданное число
 
     def ii_how_many(self, y):
         self.ii_matrix[y][0] = int(''.join(self.ii_matrix[y][1:9]), 2)
@@ -150,24 +148,31 @@ class Board:
         return rendered_score, rendered_score.get_width()
 
 
-def main(level):
-    level = hello_user.start_screen(level + 1)
+def terminate():
+    pygame.quit()
+    sys.exit()
+
+def main(level, username):
+    if level == 2:
+        hall_of_fame.main(hards.score, username)
+        terminate()
+    level, username = hello_user.start_screen(level + 1, username)
+    board = Board(10, 9, level, username)
+
     pygame.init()
     clock = pygame.time.Clock()
     fps = 60
-    start = datetime.datetime.now()
     size = 730, 730
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('Binary Game')
 
-    board = Board(10, 9, level)
     board.ii()
     ices = pygame.sprite.Group()
     ices_to_add = [hards.Ice(board.left, board.top),
-                   hards.Ice(board.left + board.cell_size * (board.width-1), board.top),
-                   hards.Ice(board.left, board.top + board.cell_size * (board.height-1)),
-                   hards.Ice(board.left + board.cell_size * (board.width-1),
-                             board.top + board.cell_size * (board.height-1))]
+                   hards.Ice(board.left + board.cell_size * (board.width - 1), board.top),
+                   hards.Ice(board.left, board.top + board.cell_size * (board.height - 1)),
+                   hards.Ice(board.left + board.cell_size * (board.width - 1),
+                             board.top + board.cell_size * (board.height - 1))]
     if level:
         for i in range(level):
             ices.add(ices_to_add[i])
@@ -180,6 +185,9 @@ def main(level):
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 board.get_click(event.pos)
+            if event.type == pygame.KEYUP:  # KEYUP удалит летающие льдышки
+                ices.remove(*ices_to_add)  # раскомментировать, лазейка для тестировщика
+
         screen.fill('#2F4F4F')
         board.render(screen)
         ices.draw(screen)
@@ -192,4 +200,4 @@ def main(level):
 
 
 if __name__ == '__main__':
-    main(0)
+    main(-1, 'Ё-моё')
