@@ -9,6 +9,8 @@ class One(pygame.sprite.Sprite):  # единичка
     def __init__(self, x, y, group_of_ones):
         super().__init__(ones_sprites)
         self.image = pygame.image.load('./img/1_red.png')
+        # self.collide_mask_pic = pygame.image.load('./img/collide_mask.png')
+        # self.collide_mask = pygame.mask.from_surface(self.collide_mask_pic)
         self.w = self.image.get_width()
         self.h = self.image.get_height()
         self.rect = self.image.get_rect()
@@ -46,7 +48,7 @@ class Ice(pygame.sprite.Sprite):
         self.h = self.ice_image.get_height() // 30
         self.image = pygame.transform.scale(self.ice_image, (self.w, self.h))
         self.rect = self.image.get_rect()
-# шаг спрайта определяем случайно, по сути это скорость
+# шаг спрайта - скорость
         self.vx = random.randint(-2, 2)
         self.vy = random.randrange(-2, 2)
 # в начале льды в по углам

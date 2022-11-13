@@ -6,7 +6,7 @@ import itertools
 import pygame
 import random
 
-import hello_user, win, hall_of_fame
+import hello_user, hall_of_fame
 
 
 class Board:
@@ -65,15 +65,19 @@ class Board:
                 screen.blit(pica, (x_pos, y_pos))
         for y in range(1, self.height - 1):
             x = 0  # слева загаданные числа
-            leftpic = self.render_digit_pic(self.ii_matrix[y][x], '#E0FFFF')
+            leftpic = self.render_pic(self.ii_matrix[y][x], '#E0FFFF')
             screen.blit(leftpic[0],
                         (self.left + self.cell_size - leftpic[1] - 10, y * self.cell_size + self.top))
             x = 9  # справа числа игрока
-            screen.blit(self.render_digit_pic(self.board[y][x], '#EEE8AA')[0],
+            screen.blit(self.render_pic(self.board[y][x], '#EEE8AA')[0],
                         (x * self.cell_size + self.left + 10, y * self.cell_size + self.top))
         # инфо-панель пользователя
         render_score = self.render_score()
         screen.blit(render_score[0], (730 - render_score[1] - 10, 20))
+        if self.username:
+            screen.blit(self.render_pic('Игрок: ' + self.username, '#EEE8AA')[0], (730 // 4, 20))
+        else:
+            screen.blit(self.render_pic('Нет имени игрока', '#EEE8AA')[0], (730 // 4, 20))
 
     # настройка внешнего вида
     def set_view(self, left, top, cell_size):
@@ -119,14 +123,19 @@ class Board:
     def ii(self):
         for y in range(1, 9):
             if self.ii_matrix[y][0] != '+':
-                if self.level > 2:
+                if self.level > 1:
                     ones = random.randint(1, 6)
                 else:
                     ones = self.level + 1
-                new_digit = ['1'] * ones + ['0'] * (self.width - 2 - ones)
-                random.shuffle(new_digit)
-                self.ii_matrix[y][1:9] = new_digit
-                self.ii_how_many(y)  # десятичное загаданное число
+                while True:
+                    new_digit = ['1'] * ones + ['0'] * (self.width - 2 - ones)
+                    random.shuffle(new_digit)
+                    self.ii_matrix[y][1:9] = new_digit
+                    self.ii_how_many(y)  # десятичное загаданное число
+                    if self.ii_matrix[y][1:9] in self.ii_matrix:
+                        continue
+                    else:
+                        break
 
     def ii_how_many(self, y):
         self.ii_matrix[y][0] = int(''.join(self.ii_matrix[y][1:9]), 2)
@@ -137,7 +146,7 @@ class Board:
             sm += str(self.board[y][x])
         self.board[y][-1] = int(sm, 2)
 
-    def render_digit_pic(self, digit, color):
+    def render_pic(self, digit, color):
         font = pygame.font.Font(None, 64)
         rendered = font.render(str(digit), True, color)
         return rendered, rendered.get_width()
@@ -153,7 +162,7 @@ def terminate():
     sys.exit()
 
 def main(level, username):
-    if level == 2:
+    if level == 4:
         hall_of_fame.main(hards.score, username)
         terminate()
     level, username = hello_user.start_screen(level + 1, username)
@@ -200,4 +209,4 @@ def main(level, username):
 
 
 if __name__ == '__main__':
-    main(-1, 'Ё-моё')
+    main(-1, '')
