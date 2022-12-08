@@ -5,11 +5,12 @@ import pygame
 
 class Table:
     # создание поля
-    def __init__(self, width, height, output, gamer):
+    def __init__(self, width, height, output, gamer, score):
         self.width = width
         self.height = height
         self.data = output
         self.gamer = gamer
+        self.score = score
         self.board = [[0] * width for _ in range(height)]
         # значения по умолчанию
         self.left = 80
@@ -22,19 +23,28 @@ class Table:
         self.top = top
         self.cell_size = cell_size
 
+
+    def render_pic(self, gamer, score):
+        font = pygame.font.Font(None, 64)
+        rendered = font.render(gamer + str(score), True, pygame.Color('#3C6371'))
+        return rendered
+
+
     def render(self, screen):
+        f1 = pygame.font.Font('./font/CoreSans.ttf', 32)
+        screen.blit(self.render_pic('Игрок: ' + self.gamer[:15] + ' ', self.score), (60, 20))
         for y in range(self.height):
             x = 0
-            f1 = pygame.font.Font('./font/CoreSans.ttf', 32)
-            screen.blit(f1.render(str(self.data[y][x]), 1, pygame.Color('#3C6371')),
+
+            screen.blit(f1.render(str(self.data[y][x]), True, pygame.Color('#3C6371')),
                         (x * self.cell_size + 10 + self.left, y * self.cell_size + self.cell_size // 3 + self.top,
                          self.cell_size, self.cell_size))
             # pygame.draw.rect(screen, pygame.Color(50, 155, 55), (
             #     x * self.cell_size + self.left, y * self.cell_size + self.top, self.cell_size + 15,
             #     self.cell_size), 2)
             x = 1
-            f1 = pygame.font.Font('./font/CoreSans.ttf', 32)
-            screen.blit(f1.render(str(self.data[y][x]), 1, pygame.Color('#3C6371')),
+            # f1 = pygame.font.Font('./font/CoreSans.ttf', 32)
+            screen.blit(f1.render(str(self.data[y][x]), True, pygame.Color('#3C6371')),
                         (x * self.cell_size + 28 + self.left, y * self.cell_size + self.cell_size // 3 + self.top,
                          self.cell_size, self.cell_size))
             if str(self.data[y][x]) == self.gamer:
@@ -71,10 +81,9 @@ def main(score, gamer):
 
 
     connection.close()
-    board = Table(2, min(9, len(output)), data, gamer)
+    board = Table(2, min(9, len(output)), data, gamer, score)
     size = 730, 730
     pygame.init()
-    clock = pygame.time.Clock()
     screen = pygame.display.set_mode(size)
 
     pygame.display.set_caption('Binary Game hello')
@@ -91,4 +100,4 @@ def main(score, gamer):
 
 
 if __name__ == "__main__":
-    main(164, 'Student')
+    main(665, 'Student')

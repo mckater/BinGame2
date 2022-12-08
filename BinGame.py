@@ -1,4 +1,3 @@
-import datetime
 import sys
 
 import hards
@@ -17,7 +16,7 @@ class Board:
         self.height = height
         self.username = username
         self.board = [[0] * width for _ in range(height)]
-        self.ii_matrix = [[0] * width for _ in range(height)]
+        self.ii_matrix = [['0'] * width for _ in range(height)]
         # значения по умолчанию
         self.game_over = False
         self.cell_stop_list = list()  # блокируем уже решённые строки
@@ -25,12 +24,13 @@ class Board:
         self.left = 35
         self.top = 100
         self.cell_size = 66
+        self.colors = [pygame.Color("#006400"), pygame.Color("#fcbdcb"), pygame.Color("black"),
+                       pygame.Color('#E0FFFF'), pygame.Color('#EEE8AA')]
         self.images = ['./img/ice_small.png', './img/2_7_128.png', './img/2_6_64.png', './img/2_5_32.png',
                        './img/2_4_16.png', './img/2_3_8.png', './img/2_2_4.png', './img/2_1_2.png', './img/2_0_1.png',
                        './img/ice_small.png']
 
     def render(self, screen):
-        colors = [pygame.Color("#006400"), pygame.Color("#3CB371"), pygame.Color("black")]
         for y in range(1, self.height - 1):
             if self.board[y][9] != 0:
                 flag = False
@@ -38,17 +38,17 @@ class Board:
                     if self.board[y][x] == 1:
                         flag = True
                     if flag:
-                        pygame.draw.rect(screen, colors[1], (
+                        pygame.draw.rect(screen, self.colors[1], (
                             x * self.cell_size + self.left, y * self.cell_size + self.top, self.cell_size,
                             self.cell_size))
                     else:
-                        pygame.draw.rect(screen, colors[self.board[y][x]], (
+                        pygame.draw.rect(screen, self.colors[self.board[y][x]], (
                             x * self.cell_size + self.left, y * self.cell_size + self.top, self.cell_size,
                             self.cell_size))
 
             else:
                 for x in range(1, self.width - 1):
-                    pygame.draw.rect(screen, colors[self.board[y][x]], (
+                    pygame.draw.rect(screen, self.colors[self.board[y][x]], (
                         x * self.cell_size + self.left, y * self.cell_size + self.top, self.cell_size,
                         self.cell_size))
         for x, y in itertools.product(range(1, self.width - 1), range(1, self.height - 1)):
@@ -65,19 +65,19 @@ class Board:
                 screen.blit(pica, (x_pos, y_pos))
         for y in range(1, self.height - 1):
             x = 0  # слева загаданные числа
-            leftpic = self.render_pic(self.ii_matrix[y][x], '#E0FFFF')
+            leftpic = self.render_pic(self.ii_matrix[y][x], self.colors[3])
             screen.blit(leftpic[0],
                         (self.left + self.cell_size - leftpic[1] - 10, y * self.cell_size + self.top))
             x = 9  # справа числа игрока
-            screen.blit(self.render_pic(self.board[y][x], '#EEE8AA')[0],
+            screen.blit(self.render_pic(self.board[y][x], self.colors[4])[0],
                         (x * self.cell_size + self.left + 10, y * self.cell_size + self.top))
         # инфо-панель пользователя
         render_score = self.render_score()
         screen.blit(render_score[0], (730 - render_score[1] - 10, 20))
         if self.username:
-            screen.blit(self.render_pic('Игрок: ' + self.username, '#EEE8AA')[0], (730 // 4, 20))
+            screen.blit(self.render_pic('Игрок: ' + self.username[:15], self.colors[4])[0], (20, 20))
         else:
-            screen.blit(self.render_pic('Нет имени игрока', '#EEE8AA')[0], (730 // 4, 20))
+            screen.blit(self.render_pic('Нет имени игрока', self.colors[4])[0], (730 // 4, 20))
 
     # настройка внешнего вида
     def set_view(self, left, top, cell_size):
@@ -130,11 +130,10 @@ class Board:
                 while True:
                     new_digit = ['1'] * ones + ['0'] * (self.width - 2 - ones)
                     random.shuffle(new_digit)
-                    self.ii_matrix[y][1:9] = new_digit
-                    self.ii_how_many(y)  # десятичное загаданное число
-                    if self.ii_matrix[y][1:9] in self.ii_matrix:
-                        continue
-                    else:
+                    if self.ii_matrix[y][1:9] not in self.ii_matrix:
+                        self.ii_matrix[y][1:9] = new_digit
+                        self.ii_how_many(y)  # десятичное загаданное число
+                    if [['0'] * self.width for _ in range(self.height)] not in self.ii_matrix:
                         break
 
     def ii_how_many(self, y):
@@ -197,7 +196,7 @@ def main(level, username):
             if event.type == pygame.KEYUP:  # KEYUP удалит летающие льдышки
                 ices.remove(*ices_to_add)  # раскомментировать, лазейка для тестировщика
 
-        screen.fill('#2F4F4F')
+        screen.fill(pygame.Color('#2F4F4F'))
         board.render(screen)
         ices.draw(screen)
         ices.update(size)

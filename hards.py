@@ -9,16 +9,16 @@ class One(pygame.sprite.Sprite):  # единичка
     def __init__(self, x, y, group_of_ones):
         super().__init__(ones_sprites)
         self.image = pygame.image.load('./img/1_red.png')
-        # self.collide_mask_pic = pygame.image.load('./img/collide_mask.png')
-        # self.collide_mask = pygame.mask.from_surface(self.collide_mask_pic)
+        self.collide_mask_pic = pygame.image.load('./img/collide_mask.png')
+        self.collide_mask = pygame.mask.from_surface(self.collide_mask_pic)
         self.w = self.image.get_width()
         self.h = self.image.get_height()
         self.rect = self.image.get_rect()
-# перехватываем расположение каждой единички в угаданных числах
+        # перехватываем расположение каждой единички в угаданных числах
         self.rect.left = x
         self.rect.top = y
-# 35, 66 и 100 можно бы передать из борды, но мы не собираемся менять размеры
-# Можно так.
+        # 35, 66 и 100 можно бы передать из борды, но мы не собираемся менять размеры
+        # Можно так.
         self.cell_x = (x - 35) // 66
         self.cell_y = (y - 100) // 66
 
@@ -26,18 +26,19 @@ class One(pygame.sprite.Sprite):  # единичка
 
     def update(self, group_of_ice, board):
         global score
-        if pygame.sprite.spritecollideany(self, group_of_ice):
-
-# заново считаем загаданное число
-            board.ii_how_many(self.cell_y)
-# разблокируем эту клетку для пользователя
-            board.cell_stop_list.remove((self.cell_x, self.cell_y))
-# у игрока эта его клетка - снова ноль
-            board.board[self.cell_y][self.cell_x] = 0
-# и число игрока справа - пересчитывается
-            board.count_user_digit(self.cell_y)
-            self.kill()
-            score -= 5
+        # if pygame.sprite.spritecollideany(self, group_of_ice):
+        for el in group_of_ice:  # по льдинкам проверяем на столкновение
+            if pygame.sprite.collide_mask(self, el):  # если столкнулось с 1-кой
+                # заново считаем загаданное число
+                board.ii_how_many(self.cell_y)
+                # разблокируем эту клетку для пользователя
+                board.cell_stop_list.remove((self.cell_x, self.cell_y))
+                # у игрока эта его клетка - снова ноль
+                board.board[self.cell_y][self.cell_x] = 0
+                # и число игрока справа - пересчитывается
+                board.count_user_digit(self.cell_y)
+                self.kill()
+                score -= 5
 
 
 class Ice(pygame.sprite.Sprite):
@@ -48,10 +49,10 @@ class Ice(pygame.sprite.Sprite):
         self.h = self.ice_image.get_height() // 30
         self.image = pygame.transform.scale(self.ice_image, (self.w, self.h))
         self.rect = self.image.get_rect()
-# шаг спрайта - скорость
+        # шаг спрайта - скорость
         self.vx = random.randint(-2, 2)
         self.vy = random.randrange(-2, 2)
-# в начале льды в по углам
+        # в начале льды в по углам
         self.rect.left = x
         self.rect.top = y
 
