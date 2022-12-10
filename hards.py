@@ -46,8 +46,8 @@ class Ice(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__(ice_sprites)
         self.ice_image = pygame.image.load('./img/ice.png')
-        self.w = self.ice_image.get_width() // 30
-        self.h = self.ice_image.get_height() // 30
+        self.w = self.ice_image.get_width() // 6
+        self.h = self.ice_image.get_height() // 6
         self.image = pygame.transform.scale(self.ice_image, (self.w, self.h))
         self.rect = self.image.get_rect()
         # шаг спрайта - скорость
