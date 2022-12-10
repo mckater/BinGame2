@@ -162,6 +162,7 @@ def terminate():
     pygame.quit()
     sys.exit()
 
+
 def main(level, username):
     if level == 4:
         hall_of_fame.main(hards.score, username)
@@ -171,7 +172,7 @@ def main(level, username):
 
     pygame.init()
     clock = pygame.time.Clock()
-    fps = 60
+    fps = 15
     size = 730, 730
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('Binary Game 2')

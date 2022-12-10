@@ -45,11 +45,17 @@ class One(pygame.sprite.Sprite):  # единичка
 class Ice(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__(ice_sprites)
-        self.ice_image = pygame.image.load('./img/ice.png')
-        self.w = self.ice_image.get_width() // 6
-        self.h = self.ice_image.get_height() // 6
+        # self.ice_image = pygame.image.load('./img/ice.png')
+        self.frames = []
+        self.ice_image = pygame.image.load('./img/pngegg_sm.png')
+        self.cut_sheet(self.ice_image, 5, 5)
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
+
+        self.w = self.ice_image.get_width() // 5
+        self.h = self.ice_image.get_height() // 5
         self.image = pygame.transform.scale(self.ice_image, (self.w, self.h))
-        self.rect = self.image.get_rect()
+        # self.rect = self.image.get_rect()
         # шаг спрайта - скорость
         self.vx = random.choice((-1.5, -1, 1, 1.5))
         self.vy = random.choice((-1.5, -1, 1, 1.5))
@@ -58,8 +64,19 @@ class Ice(pygame.sprite.Sprite):
         self.rect.left = x
         self.rect.top = y
 
+
+    def cut_sheet(self, sheet, columns, rows):
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns, sheet.get_height() // rows)
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                self.frames.append(sheet.subsurface(pygame.Rect(frame_location, self.rect.size)))
+
+
     def update(self, size):
         w, h = size
+        self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+        self.image = self.frames[self.cur_frame]
         self.rect = self.rect.move(self.vx, self.vy)  # шаг спрайта
         if self.rect.x > w - self.w or self.rect.x <= 0:
             self.vx = -self.vx

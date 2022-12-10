@@ -6,6 +6,7 @@ import pygame
 FPS = 10
 all_sprites = pygame.sprite.Group()
 
+
 class Table:
     # создание поля
     def __init__(self, width, height, output, gamer, score,):
@@ -120,7 +121,7 @@ def main(score, gamer='Unknown'):
     screen = pygame.display.set_mode(size)
 
     pygame.display.set_caption('Binary Game FameHall')
-    sprt = AnimatedSprite(load_image("pngegg.png"), 5, 5, 500, 500)
+    _ = AnimatedSprite(load_image("pngegg.png"), 5, 5, 500, 500)
     running = True
     while running:
         for event in pygame.event.get():

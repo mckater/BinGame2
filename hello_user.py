@@ -21,8 +21,7 @@ class Levels:
                 font = pygame.font.Font(None, 60)
                 screen.blit(font.render(str(y) + '.lvl', True, pygame.Color('orange')),
                             (x * self.cell_size + 18 + self.left,
-                             y * self.cell_size + self.cell_size // 3 + self.top, self.cell_size,
-                    self.cell_size))
+                             y * self.cell_size + self.cell_size // 3 + self.top, self.cell_size, self.cell_size))
                 pygame.draw.rect(screen, pygame.Color(255, 255, 255), (
                     x * self.cell_size + self.left, y * self.cell_size + self.top, self.cell_size,
                     self.cell_size), 3)
