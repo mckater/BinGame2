@@ -19,7 +19,7 @@ class Levels:
         for y in range(self.height):
             for x in range(self.width):
                 font = pygame.font.Font(None, 60)
-                screen.blit(font.render(str(y) + '.lvl', 1, pygame.Color('orange')),
+                screen.blit(font.render(str(y) + '.lvl', True, pygame.Color('orange')),
                             (x * self.cell_size + 18 + self.left,
                              y * self.cell_size + self.cell_size // 3 + self.top, self.cell_size,
                     self.cell_size))
@@ -45,8 +45,6 @@ class Levels:
         if cell:
             print(f'now level = {sum(cell)}, username = {self.username}')
             return sum(cell), self.username
-        else:
-            pass
 
 
 def terminate():
@@ -56,12 +54,12 @@ def terminate():
 
 def start_screen(lvl, username):
     intro_text = ["Binary Game", "",
-                  "Ведите Ваше имя:",
+                  "Введите Ваше имя:", "",
                   "собирайте двоичные числа,",
                   f"НАБРАНО ОЧКОВ: {hards.score}",
                   f"ВЫБЕРИТЕ УРОВЕНЬ: до {lvl}"]
-
-    fon = pygame.image.load('./img/metal.png')
+    screen.fill(pygame.Color('black'))
+    fon = pygame.image.load('./img/ice_1.png')
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 36)
     text_coord = 60
@@ -70,18 +68,16 @@ def start_screen(lvl, username):
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
-        intro_rect.x = 10
+        intro_rect.x = 80
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
     base_font = pygame.font.Font(None, 32)
     user_text = username
 
-    input_rect = pygame.Rect(250, 130, 140, 32)
+    input_rect = pygame.Rect(80, 170, 140, 32)
     color_active = pygame.Color("#3CB371")
 
     color_passive = pygame.Color("#006400")
-    color = color_passive
-
     active = False
 
     levels = Levels(1, lvl + 1, username)
@@ -116,7 +112,7 @@ def start_screen(lvl, username):
             color = color_passive
 
         pygame.draw.rect(screen, color, input_rect)
-        text_surface = base_font.render(user_text, True, ("black"))
+        text_surface = base_font.render(user_text, True, "black")
 
         # рендеринг согласно вводу мени пользователя
         screen.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
@@ -132,4 +128,4 @@ pygame.init()
 clock = pygame.time.Clock()
 FPS = 50
 screen = pygame.display.set_mode(size)
-pygame.display.set_caption('Binary Game hello')
+pygame.display.set_caption('Binary Game 2')

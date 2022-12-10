@@ -5,6 +5,7 @@ ice_sprites = pygame.sprite.Group()
 ones_sprites = pygame.sprite.Group()
 score = 0
 
+
 class One(pygame.sprite.Sprite):  # единичка
     def __init__(self, x, y, group_of_ones):
         super().__init__(ones_sprites)
@@ -18,7 +19,7 @@ class One(pygame.sprite.Sprite):  # единичка
         self.rect.left = x
         self.rect.top = y
         # 35, 66 и 100 можно бы передать из борды, но мы не собираемся менять размеры
-        # Можно так.
+        # Можно и так.
         self.cell_x = (x - 35) // 66
         self.cell_y = (y - 100) // 66
 
@@ -30,7 +31,7 @@ class One(pygame.sprite.Sprite):  # единичка
         for el in group_of_ice:  # по льдинкам проверяем на столкновение
             if pygame.sprite.collide_mask(self, el):  # если столкнулось с 1-кой
                 # заново считаем загаданное число
-                board.ii_how_many(self.cell_y)
+                board.ii_matrix[self.cell_y][0] = board.ii_how_many(board.ii_matrix[self.cell_y][1:9])
                 # разблокируем эту клетку для пользователя
                 board.cell_stop_list.remove((self.cell_x, self.cell_y))
                 # у игрока эта его клетка - снова ноль
@@ -50,8 +51,9 @@ class Ice(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.ice_image, (self.w, self.h))
         self.rect = self.image.get_rect()
         # шаг спрайта - скорость
-        self.vx = random.randint(-2, 2)
-        self.vy = random.randrange(-2, 2)
+        self.vx = random.choice((-1.5, -1, 1, 1.5))
+        self.vy = random.choice((-1.5, -1, 1, 1.5))
+        print(self.vx, self.vy)
         # в начале льды в по углам
         self.rect.left = x
         self.rect.top = y

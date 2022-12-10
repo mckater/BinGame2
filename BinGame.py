@@ -1,11 +1,12 @@
+import itertools
+import random
 import sys
 
-import hards
-import itertools
 import pygame
-import random
 
-import hello_user, hall_of_fame
+import hall_of_fame
+import hards
+import hello_user
 
 
 class Board:
@@ -130,15 +131,16 @@ class Board:
                 while True:
                     new_digit = ['1'] * ones + ['0'] * (self.width - 2 - ones)
                     random.shuffle(new_digit)
-                    if self.ii_matrix[y][1:9] not in self.ii_matrix:
+                    if ([self.ii_how_many(new_digit)] + new_digit + ['0']) not in self.ii_matrix:
                         self.ii_matrix[y][1:9] = new_digit
-                        self.ii_how_many(y)  # десятичное загаданное число
-                    if [['0'] * self.width for _ in range(self.height)] not in self.ii_matrix:
+                        self.ii_matrix[y][0] = self.ii_how_many(new_digit)  # десятичное загаданное число
+                    else:
+                        continue
+                    if [0, '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'] not in self.ii_matrix:
                         break
 
     def ii_how_many(self, y):
-        self.ii_matrix[y][0] = int(''.join(self.ii_matrix[y][1:9]), 2)
-
+        return int(''.join(y), 2)
     def count_user_digit(self, y):
         sm = ''
         for x in range(1, self.width - 1):
@@ -172,7 +174,7 @@ def main(level, username):
     fps = 60
     size = 730, 730
     screen = pygame.display.set_mode(size)
-    pygame.display.set_caption('Binary Game')
+    pygame.display.set_caption('Binary Game 2')
 
     board.ii()
     ices = pygame.sprite.Group()
@@ -190,11 +192,13 @@ def main(level, username):
     while running and not board.game_over:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                pygame.quit()
                 running = False
+                sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 board.get_click(event.pos)
-            if event.type == pygame.KEYUP:  # KEYUP удалит летающие льдышки
-                ices.remove(*ices_to_add)  # раскомментировать, лазейка для тестировщика
+            # if event.type == pygame.KEYUP:  # KEYUP удалит летающие льдышки
+            #     ices.remove(*ices_to_add)  # раскомментировать, лазейка для тестировщика
 
         screen.fill(pygame.Color('#2F4F4F'))
         board.render(screen)
